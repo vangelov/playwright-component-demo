@@ -1,6 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-export function locateHeader(page: Page) {
+export function Header(page: Page) {
   const self = page.locator('header');
 
   const input = self.getByPlaceholder('What needs to be done?');
@@ -29,26 +29,28 @@ export function locateHeader(page: Page) {
 
 //
 
-export function locateTodosList(page: Page) {
+export function TodoList(page: Page) {
   const self = page.getByRole('list');
 
-  const locateTodos = (options: LocateTodoOptions = {}) => locateTodo(self, options);
-  const locateTodoAt = (index: number) => locateTodos({ index });
-  const getTodosCount = () => locateTodos().count();
+  const todos = (options: LocateTodoOptions = {}) => Todo(self, options);
+  const todoAt = (index: number) => todos({ index });
+  const getTodosCount = () => todos().count();
 
   const forEach = async (f: (todo: Todo) => Promise<void>) => {
     const todosCount = await getTodosCount();
-    for (let i = 0; i < todosCount; i++) 
-      await f(locateTodoAt(i));
+    
+    for (let i = 0; i < todosCount; i++) {
+      await f(todoAt(i));
+    }
   }
 
   return { 
-    locateTodoAt,
-    locateTodos,
-    expext: () => ({
+    todoAt,
+    todos,
+    expect: () => ({
       ...expect(self),
-      toHaveCompletedNone: () => forEach(todo => todo.expect().toBeCompleted()),
-      toHaveCompletedAll: () => forEach(todo => todo.expect().notToBeCompleted()),
+      toHaveAllCompleted: () => forEach(todo => todo.expect().toBeCompleted()),
+      toHaveNoneCompleted: () => forEach(todo => todo.expect().notToBeCompleted()),
     }),
   }; 
 }
@@ -56,9 +58,9 @@ export function locateTodosList(page: Page) {
 //
 
 type LocateTodoOptions = { index?: number };
-type Todo = ReturnType<typeof locateTodo>;
+type Todo = ReturnType<typeof Todo>;
 
-export function locateTodo(parent: Locator, options: LocateTodoOptions = {}) {
+export function Todo(parent: Locator, options: LocateTodoOptions = {}) {
   let self = parent.getByTestId('todo-item');
   if (options.index !== undefined) self = self.nth(options.index);
 
@@ -103,21 +105,23 @@ export function locateTodo(parent: Locator, options: LocateTodoOptions = {}) {
 
 //
 
-export function locateFooter(page: Page) {
+export function Footer(page: Page) {
   const self = page.locator('footer');
 
   const countText = self.getByTestId('todo-count');
   const clearCompletedButton = self.getByRole('button', { name: 'Clear completed' });
 
   const clearCompleted = () => clearCompletedButton.click();
-  const locateLink = (name: string) => locateFooterLink(self, { name });
+  const link = (name: string) => FooterLink(self, { name });
+  const selectLink = (name: string) => link(name).select();
 
   return {
     clearCompleted,
-    locateLink,
+    link,
+    selectLink,
     expect: () => ({
       ...expect(self),
-      toHaveCount: (text: string) => expect(countText).toHaveText(text),
+      toHaveCountText: (text: string) => expect(countText).toHaveText(text),
       toHaveVisibleCount: () => expect(countText).toBeVisible(),
       toAllowClearingCompleted: (visible: boolean = true) => expect(clearCompletedButton).toBeVisible({ visible }),
     }),
@@ -128,7 +132,7 @@ type LocateFooterOptions = {
   name: string;
 }
 
-export function locateFooterLink(parent: Locator, { name }: LocateFooterOptions) {
+export function FooterLink(parent: Locator, { name }: LocateFooterOptions) {
   const self = parent.getByRole('link', { name });
 
   const select = () => self.click();
