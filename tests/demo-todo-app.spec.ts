@@ -1,10 +1,10 @@
 import { test, type Page } from '@playwright/test';
 import { Footer, Header, TodoList } from './components';
-
+ 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://demo.playwright.dev/todomvc');
 });
-
+ 
 const TODO_ITEMS = [
   'buy some cheese',
   'feed the cat',
@@ -289,7 +289,7 @@ test.describe('Clear completed button', () => {
 
   test('should be hidden when there are no items that are completed', async ({ page }) => {
     await TodoList(page).todoAt(1).complete();
-    
+
     const footer = Footer(page);
     await footer.clearCompleted();
     await footer.expect().toAllowClearingCompleted(false);
