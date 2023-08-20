@@ -20,7 +20,7 @@ Here's a general template of what a component looks like in this context:
 ```
 export function Component (parent, options = {}) {
   const self = parent.locator(...); // The locator for the component's root node
-  const child = self.locator(...); // Child element which is too small to be a separate component
+  const child = self.locator(...); // Child element which is too simple to be a separate component
   const otherComponent = (options) => OtherComponent(self, options); // Child component 
 
   // Actions of the component hide the internal details of which child or component is used
