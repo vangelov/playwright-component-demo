@@ -100,7 +100,7 @@ test('should be hidden when there are no items that are completed', async ({ pag
 });
 ```
 
-### Example 3
+#### Example 3
 
 ```
 test('should highlight the currently applied filter', async ({ page }) => {
