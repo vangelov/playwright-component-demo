@@ -20,9 +20,8 @@ export function Header(page: Page) {
     uncompleteAll,
     expect: () => ({
       ...expect(self),
-      toAllowUncompleteAll: () => expect(toggleAllButton).toBeChecked(),
-      notToAllowUncompleteAll: () => expect(toggleAllButton).not.toBeChecked(),
+      toAllowUncompleteAll: (allow = true) => expect(toggleAllButton).toBeChecked({ checked: allow }),
       toHaveEmptyInput: () => expect(input).toBeEmpty()
     })
   };
-}
+} 

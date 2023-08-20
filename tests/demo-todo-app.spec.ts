@@ -102,7 +102,7 @@ test.describe('Mark all as completed', () => {
     await firstTodo.uncomplete();
 
     // Reuse toggleAll locator and make sure its not checked.
-    await header.expect().notToAllowUncompleteAll();
+    await header.expect().toAllowUncompleteAll(false);
 
     await firstTodo.complete();
     await checkNumberOfCompletedTodosInLocalStorage(page, 3);
@@ -273,7 +273,7 @@ test.describe('Clear completed button', () => {
 
   test('should display the correct text', async ({ page }) => {
     await TodoList(page).todoAt(0).complete();
-    await Footer(page).expect().toAllowClearingCompleted();
+    await Footer(page).expect().toAllowClearCompleted();
   });
 
   test('should remove completed items when clicked', async ({ page }) => {
@@ -292,7 +292,7 @@ test.describe('Clear completed button', () => {
 
     const footer = Footer(page);
     await footer.clearCompleted();
-    await footer.expect().toAllowClearingCompleted(false);
+    await footer.expect().toAllowClearCompleted(false);
   });
 });
 

@@ -18,7 +18,7 @@ export function Footer(page: Page) {
       ...expect(self),
       toHaveCountText: (text: string) => expect(countText).toHaveText(text),
       toHaveVisibleCount: () => expect(countText).toBeVisible(),
-      toAllowClearingCompleted: (visible: boolean = true) => expect(clearCompletedButton).toBeVisible({ visible }),
+      toAllowClearCompleted: (visible: boolean = true) => expect(clearCompletedButton).toBeVisible({ visible }),
     }),
   };
 } 
@@ -27,7 +27,7 @@ export function Footer(page: Page) {
 
 type FooterLinkOptions = {
   name: string;
-}
+};
 
 export function FooterLink(parent: Locator, { name }: FooterLinkOptions) {
   const self = parent.getByRole('link', { name });

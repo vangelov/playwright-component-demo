@@ -18,7 +18,7 @@ export function Todo(parent: Locator, options: TodoOptions = {}) {
   const uncomplete = () => checkbox.uncheck();
   const blur = () => textbox.dispatchEvent('blur');
   const count = () => self.count();
-
+ 
   const save = async (text: string) => {
     await fill(text);
     await textbox.press('Enter');
@@ -53,12 +53,11 @@ export function TodoList(page: Page) {
 
   const todos = (options: TodoOptions = {}) => Todo(self, options);
   const todoAt = (index: number) => todos({ index });
-  const getTodosCount = () => todos().count();
 
   const forEach = async (f: (todo: Todo) => Promise<void>) => {
-    const todosCount = await getTodosCount();
+    const count = await todos().count();
     
-    for (let i = 0; i < todosCount; i++) {
+    for (let i = 0; i < count; i++) {
       await f(todoAt(i));
     }
   }
