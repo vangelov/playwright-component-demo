@@ -55,6 +55,7 @@ Here's a few comparisions between the original and the updated tests:
 
 #### Example 1
 
+
 ```
 test('should allow me to mark all items as completed', async ({ page }) => {
     // Complete all todos.
@@ -83,10 +84,9 @@ test('should allow me to mark all items as completed', async ({ page }) => {
 
 ```
 test('should be hidden when there are no items that are completed', async ({ page }) => {
-  await TodoList(page).todoAt(1).complete();
-  const footer = Footer(page);
-  await footer.clearCompleted();
-  await footer.expect().toAllowClearCompleted(false);
+  await page.locator('.todo-list li .toggle').first().check();
+  await page.getByRole('button', { name: 'Clear completed' }).click();
+  await expect(page.getByRole('button', { name: 'Clear completed' })).toBeHidden();
 });
 ```
 
@@ -94,13 +94,28 @@ vs
 
 ```
 test('should be hidden when there are no items that are completed', async ({ page }) => {
-  await page.locator('.todo-list li .toggle').first().check();
-  await page.getByRole('button', { name: 'Clear completed' }).click();
-  await expect(page.getByRole('button', { name: 'Clear completed' })).toBeHidden();
+  await TodoList(page).todoAt(1).complete();
+  const footer = Footer(page);
+  await footer.clearCompleted();
+  await footer.expect().toAllowClearCompleted(false);
 });
 ```
 
 #### Example 3
+
+```
+test('should highlight the currently applied filter', async ({ page }) => {
+  await expect(page.getByRole('link', { name: 'All' })).toHaveClass('selected');
+  await page.getByRole('link', { name: 'Active' }).click();
+  // Page change - active items.
+  await expect(page.getByRole('link', { name: 'Active' })).toHaveClass('selected');
+  await page.getByRole('link', { name: 'Completed' }).click();
+  // Page change - completed items.
+  await expect(page.getByRole('link', { name: 'Completed' })).toHaveClass('selected');
+});
+```
+
+vs
 
 ```
 test('should highlight the currently applied filter', async ({ page }) => {
@@ -115,16 +130,3 @@ test('should highlight the currently applied filter', async ({ page }) => {
 });
 ```
 
-vs 
-
-```
-test('should highlight the currently applied filter', async ({ page }) => {
-  await expect(page.getByRole('link', { name: 'All' })).toHaveClass('selected');
-  await page.getByRole('link', { name: 'Active' }).click();
-  // Page change - active items.
-  await expect(page.getByRole('link', { name: 'Active' })).toHaveClass('selected');
-  await page.getByRole('link', { name: 'Completed' }).click();
-  // Page change - completed items.
-  await expect(page.getByRole('link', { name: 'Completed' })).toHaveClass('selected');
-});
-```
