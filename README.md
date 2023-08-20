@@ -23,7 +23,7 @@ export function Component (parent, options = {}) {
   const child = self.locator(...); // Child element which is too small to be a separate components
   const otherComponent = (options) => OtherComponent(self, options); // child component 
 
-  // actions of the component hide the internal details of which child or component is used
+  // Actions of the component hide the internal details of which child or component is used
   const someAction = () => child.click(); 
   const anotherAction = (param) => otherComponent({ param }).action(); 
 
@@ -46,7 +46,85 @@ test(async ({ page }) => {
   const component = Component(page);
   await component.expect().toBeVisible();
   await component.someAction();
-  await component.toHaveCustomCondition();
+  await component.expect().toHaveCustomCondition();
 });
 ```
- 
+## Comparison
+
+Here's a few comparisions between the original and the updated tests:
+
+#### Example 1
+
+```
+test('should allow me to mark all items as completed', async ({ page }) => {
+    // Complete all todos.
+  await page.getByLabel('Mark all as complete').check();
+
+  // Ensure all todos have 'completed' class.
+  await expect(page.getByTestId('todo-item')).toHaveClass(['completed', 'completed', 'completed']);
+  await checkNumberOfCompletedTodosInLocalStorage(page, 3);
+});
+```
+
+vs
+
+```
+test('should allow me to mark all items as completed', async ({ page }) => {
+  // Complete all todos.
+  await Header(page).completeAll(); 
+
+  // Ensure all todos have 'completed' class.
+  await TodoList(page).expect().toHaveAllCompleted();
+  await checkNumberOfCompletedTodosInLocalStorage(page, 3);
+});
+```
+
+#### Example 2
+
+```
+test('should be hidden when there are no items that are completed', async ({ page }) => {
+  await TodoList(page).todoAt(1).complete();
+  const footer = Footer(page);
+  await footer.clearCompleted();
+  await footer.expect().toAllowClearCompleted(false);
+});
+```
+
+vs
+
+```
+test('should be hidden when there are no items that are completed', async ({ page }) => {
+  await page.locator('.todo-list li .toggle').first().check();
+  await page.getByRole('button', { name: 'Clear completed' }).click();
+  await expect(page.getByRole('button', { name: 'Clear completed' })).toBeHidden();
+});
+```
+
+### Example 3
+
+```
+test('should highlight the currently applied filter', async ({ page }) => {
+  const footer = Footer(page);
+  await footer.link('All').expect().toBeSelected();
+  await footer.selectLink('Active');
+  // Page change - active items.
+  await footer.link('Active').expect().toBeSelected();
+  await footer.selectLink('Completed');
+  // Page change - completed items.
+  await footer.link('Completed').expect().toBeSelected();
+});
+```
+
+vs 
+
+```
+test('should highlight the currently applied filter', async ({ page }) => {
+  await expect(page.getByRole('link', { name: 'All' })).toHaveClass('selected');
+  await page.getByRole('link', { name: 'Active' }).click();
+  // Page change - active items.
+  await expect(page.getByRole('link', { name: 'Active' })).toHaveClass('selected');
+  await page.getByRole('link', { name: 'Completed' }).click();
+  // Page change - completed items.
+  await expect(page.getByRole('link', { name: 'Completed' })).toHaveClass('selected');
+});
+```
